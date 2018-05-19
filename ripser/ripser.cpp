@@ -31,6 +31,8 @@ with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #ifdef MATLAB_MEX_FILE
 #include <mex.h>
+#define ASSEMBLE_REDUCTION_MATRIX
+#define USE_COEFFICIENTS
 #endif
 
 template <class Key, class T> class hash_map : public std::unordered_map<Key, T> {};
@@ -1070,8 +1072,9 @@ void mexFunction(int nOutArray, mxArray *OutArray[], int nInArray, const mxArray
 	cdims[0] = dim_max+1;
 	mxArray* PDs = mxCreateCellArray(1, cdims);
 	OutArray[0] = PDs;
+	mxArray* cocycles;
 	if (nOutArray == 2) {
-		mxArray* cocycles = mxCreateCellArray(1, cdims);
+		cocycles = mxCreateCellArray(1, cdims);
 		OutArray[1] = cocycles;
 		do_cocycles = true;
 	}
@@ -1129,5 +1132,24 @@ void mexFunction(int nOutArray, mxArray *OutArray[], int nInArray, const mxArray
 		mxSetCell(PDs, dim, IPr);
 	}
 
+	if (do_cocycles) {
+		for (size_t dim = 0; dim <= dim_max; dim++) {
+			mwSize N = (mwSize)res.cocycles_by_dim[dim].size();
+			cdims[0] = N;
+			mxArray* cocyclesdim = mxCreateCellArray(1, cdims);
+			for (size_t i = 0; i < N; i++) {
+				mwSize M = (mwSize)(res.cocycles_by_dim[dim][i].size()/3);
+				mxArray* IPr = mxCreateDoubleMatrix(M, 3, mxREAL);
+				double* I = mxGetPr(IPr);
+				for (mwSize k = 0; k < M; k++) {
+					I[k] = (double)res.cocycles_by_dim[dim][i][k*3];
+					I[M+k] = (double)res.cocycles_by_dim[dim][i][k*3+1];
+					I[2*M+k] = (double)res.cocycles_by_dim[dim][i][k*3+2];
+				}
+				mxSetCell(cocyclesdim, i, IPr);
+			}
+			mxSetCell(cocycles, dim, cocyclesdim);
+		}
+	}
 }
 #endif
