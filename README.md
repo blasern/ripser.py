@@ -47,3 +47,13 @@ diagram = r.fit_transform(data)
 r.plot(diagram, show=True)
 ```
 
+## Bottleneck / Wasserstein
+This branch includes some unofficial code to compute Bottleneck/Wasserstein distances between persistence diagrams in the file DGMTools.py.  The __main__ function in that folder runs an example computing the bottleneck distance.
+
+To compute bottleneck distances, you have to install the hopcroftkarp package
+```
+pip install hopcroftkarp
+```
+
+To compute the Wasserstein distance, you will need to install the Hungarian library from the following link
+<a href = "https://github.com/hrldcpr/hungarian">https://github.com/hrldcpr/hungarian</a>
