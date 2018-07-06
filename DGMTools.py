@@ -75,7 +75,7 @@ def plotWassersteinMatching(I1, I2, matchidx, labels = ['dgm1', 'dgm2']):
 ##########            Diagram Comparison Functions                  ##########
 ##############################################################################
 
-def getWassersteinDist(S, T):
+def getWassersteinDist(pS, pT):
     """
     Perform the Wasserstein distance matching between persistence diagrams.
     Assumes first two columns of S and T are the coordinates of the persistence
@@ -86,6 +86,10 @@ def getWassersteinDist(S, T):
     :returns (tuples of matched indices, total cost, (N+M)x(N+M) cross-similarity)
     """
     import hungarian #Requires having compiled the library
+    S = np.array(pS)
+    S = S[np.isfinite(S[:, 1]), :]
+    T = np.array(pT)
+    T = T[np.isfinite(T[:, 1]), :]
 
     # Step 1: Compute CSM between S and T, including points on diagonal
     N = S.shape[0]
@@ -127,7 +131,7 @@ def getWassersteinDist(S, T):
 
     return (matchidx, matchdist, D)
 
-def getBottleneckDist(S, T):
+def getBottleneckDist(pS, pT):
     """
     Perform the Bottleneck distance matching between persistence diagrams.
     Assumes first two columns of S and T are the coordinates of the persistence
@@ -139,6 +143,10 @@ def getBottleneckDist(S, T):
     """
     from bisect import bisect_left
     from hopcroftkarp import HopcroftKarp
+    S = np.array(pS)
+    S = S[np.isfinite(S[:, 1]), :]
+    T = np.array(pT)
+    T = T[np.isfinite(T[:, 1]), :]
 
     N = S.shape[0]
     M = T.shape[0]
